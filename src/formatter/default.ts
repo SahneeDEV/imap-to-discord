@@ -20,6 +20,7 @@ export default class DefaultFormatter extends Formatter {
       ['Sender']: this.readInclude('Sender'),
       ['Body']: this.readInclude('Body'),
       ['Server']: this.readInclude('Server'),
+      ['Color']: this.readInclude('Color'),
     };
   }
 
@@ -33,7 +34,7 @@ export default class DefaultFormatter extends Formatter {
     }
   }
 
-  async runInclude(id: string, setFn: (str: string) => Promise<MessageBuilder>, readFn: () => Promise<string | undefined>) {
+  async runInclude<T>(id: string, setFn: (str: string) => Promise<MessageBuilder>, readFn: () => Promise<string | undefined>) {
     const include = this.includes[id];
     let str: undefined | string;
     if (include.replace !== null) {
@@ -71,6 +72,11 @@ export default class DefaultFormatter extends Formatter {
       'Server',
       async server => builder.setFooter(server),
       async () => `${sourceThing?.get<string>('name')}: ${sourceThing?.get<string>('user')} (${sourceThing?.get<string>('collection')})`,
+    ); 
+    await this.runInclude(
+      'Color',
+      async color => builder.setColor(parseInt(color)),
+      async () => undefined,
     );  
     return builder;
   }
